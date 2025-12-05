@@ -1,5 +1,6 @@
 import Plot from "../models/Plot.Model.js";
 import Farmer from "../models/Farmer.Model.js";
+import Message from "../models/Message.Model.js";
 
 import { getDistrictAndState } from "../services/geocodeService.js";
 import { getWeather } from "../services/weatherService.js";
@@ -69,14 +70,14 @@ export async function processAllPlotsSequentially() {
       plot.latitude = lat;
       plot.longitude = lon;
       console.log("Latitude and Longitude")
-           console.log(lat)
-           console.log(lon)
+      console.log(lat)
+      console.log(lon)
       if (!lat || !lon) {
         console.warn(`⚠️ Invalid or missing coordinates for plot "${plot.plotName}" (${plot.location})`);
         continue;
       }
 
-      let farmerLocation="Tripura";
+      let farmerLocation = "Tripura";
       const geo = await getDistrictAndState(lat, lon);
       if (geo.formattedLocation && geo.formattedLocation !== "unknown") {
         farmerLocation = geo.formattedLocation;
@@ -113,6 +114,15 @@ export async function processAllPlotsSequentially() {
       plot.lastUpdated = new Date();
       plot.lastSent = new Date();
       await plot.save();
+
+
+      // 📝 Save message entry in Message collection
+      await Message.create({
+        plotId: plot._id,
+        message: adviceRes.suggestion,
+        status: adviceRes.prediction || "healthy",
+      });
+
 
       // 📧 Send email to farmer
       const farmerEmail = plot.farmerId?.email;
