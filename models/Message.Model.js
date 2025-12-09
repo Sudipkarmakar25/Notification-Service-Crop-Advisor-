@@ -18,6 +18,7 @@ const MessageSchema = new Schema(
 
     status: {
       type: String,
+      enum: ["healthy", "moderate", "stress"],
       default: "healthy",
     },
   },
