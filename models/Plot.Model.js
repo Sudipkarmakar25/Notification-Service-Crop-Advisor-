@@ -45,7 +45,6 @@ const PlotSchema = new Schema(
 
     status: {
       type: String,
-      enum: ["healthy", "moderate", "stressed"],
       default: "healthy",
     },
 
